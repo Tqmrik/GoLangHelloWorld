@@ -2,95 +2,51 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
-func getSenderLog(s sender) string {
-	return fmt.Sprintf(`
-====================================
-Sender name: %v
-Sender number: %v
-Sender rateLimit: %v
-====================================
-`, s.name, s.number, s.rateLimit)
-}
-
 func Test(t *testing.T) {
 	type testCase struct {
-		rateLimit int
-		name      string
-		number    int
-		expected  string
+		name     string
+		expected uintptr
 	}
+
 	tests := []testCase{
-		{
-			10000,
-			"Deborah",
-			18055558790,
-			`
-====================================
-Sender name: Deborah
-Sender number: 18055558790
-Sender rateLimit: 10000
-====================================
-`,
-		},
-		{
-			5000,
-			"Jason",
-			18055558791,
-			`
-====================================
-Sender name: Jason
-Sender number: 18055558791
-Sender rateLimit: 5000
-====================================
-`,
-		},
+		{"contact", uintptr(24)},
 	}
 	if withSubmit {
-		tests = append(tests, []testCase{
-			{
-				1000,
-				"Jill",
-				18055558792,
-				`
-====================================
-Sender name: Jill
-Sender number: 18055558792
-Sender rateLimit: 1000
-====================================
-`,
-			},
-		}...)
+		tests = append(tests, testCase{"perms", uintptr(16)})
 	}
 
 	passCount := 0
 	failCount := 0
 
 	for _, test := range tests {
-		output := getSenderLog(sender{
-			rateLimit: test.rateLimit,
-			user: user{
-				name:   test.name,
-				number: test.number,
-			},
-		})
-		if output != test.expected {
+		var typ reflect.Type
+		if test.name == "contact" {
+			typ = reflect.TypeOf(contact{})
+		} else if test.name == "perms" {
+			typ = reflect.TypeOf(perms{})
+		}
+
+		size := typ.Size()
+
+		if size != test.expected {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v, %v, %v)
-Expecting:  %v
-Actual:     %v
-Fail`, test.rateLimit, test.name, test.number, test.expected, output)
+Inputs:     (%v)
+Expecting:  %v bytes
+Actual:     %v bytes
+Fail`, test.name, test.expected, size)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v, %v, %v)
-Expecting:  %v
-Actual:     %v
+Inputs:     (%v)
+Expecting:  %v bytes
+Actual:     %v bytes
 Pass
-`, test.rateLimit, test.name, test.number, test.expected, output)
+`, test.name, test.expected, size)
 		}
 	}
 

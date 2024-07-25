@@ -1,11 +1,14 @@
 package main
 
-type sender struct {
-	rateLimit int
-	user
+type contact struct {
+	sendingLimit int32
+	userID       string
+	age          int32
 }
 
-type user struct {
-	name   string
-	number int
+type perms struct {
+	canSend         bool
+	canReceive      bool
+	permissionLevel int
+	canManage       bool
 }
