@@ -1,11 +1,8 @@
 package main
 
-type sender struct {
-	rateLimit int
-	user
+type authenticationInfo struct {
+	username string
+	password string
 }
 
-type user struct {
-	name   string
-	number int
-}
+// create the method below
