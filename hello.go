@@ -6,3 +6,6 @@ type authenticationInfo struct {
 }
 
 // create the method below
+func (auth authenticationInfo) getBasicAuth() string {
+	return "Authorization: Basic " + auth.username + ":" + auth.password
+}
