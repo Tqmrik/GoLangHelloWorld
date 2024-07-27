@@ -1,34 +1,32 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
-
-func sendMessage(msg message) (string, int) {
-	return msg.getMessage(), 3 * len(msg.getMessage())
+type employee interface {
+	getName() string
+	getSalary() int
 }
 
-type message interface {
-	getMessage() string
+type contractor struct {
+	name         string
+	hourlyPay    int
+	hoursPerYear int
 }
 
-// don't edit below this line
-
-type birthdayMessage struct {
-	birthdayTime  time.Time
-	recipientName string
+func (c contractor) getName() string {
+	return c.name
+}
+func (c contractor) getSalary() int {
+	return (c.hourlyPay * c.hoursPerYear)
 }
 
-func (bm birthdayMessage) getMessage() string {
-	return fmt.Sprintf("Hi %s, it is your birthday on %s", bm.recipientName, bm.birthdayTime.Format(time.RFC3339))
+type fullTime struct {
+	name   string
+	salary int
 }
 
-type sendingReport struct {
-	reportName    string
-	numberOfSends int
+func (ft fullTime) getSalary() int {
+	return ft.salary
 }
 
-func (sr sendingReport) getMessage() string {
-	return fmt.Sprintf(`Your "%s" report is ready. You've sent %v messages.`, sr.reportName, sr.numberOfSends)
+func (ft fullTime) getName() string {
+	return ft.name
 }
