@@ -1,32 +1,35 @@
 package main
 
-type employee interface {
-	getName() string
-	getSalary() int
+type Formatter interface {
+	Format() string
 }
 
-type contractor struct {
-	name         string
-	hourlyPay    int
-	hoursPerYear int
+type PlainText struct {
+	message string
 }
 
-func (c contractor) getName() string {
-	return c.name
-}
-func (c contractor) getSalary() int {
-	return (c.hourlyPay * c.hoursPerYear)
+func (pt PlainText) Format() string {
+	return pt.message
 }
 
-type fullTime struct {
-	name   string
-	salary int
+type Bold struct {
+	message string
 }
 
-func (ft fullTime) getSalary() int {
-	return ft.salary
+func (b Bold) Format() string {
+	return "**" + b.message + "**"
 }
 
-func (ft fullTime) getName() string {
-	return ft.name
+type Code struct {
+	message string
+}
+
+func (c Code) Format() string {
+	return "`" + c.message + "`"
+}
+
+// Don't Touch below this line
+
+func SendMessage(formatter Formatter) string {
+	return formatter.Format() // Adjusted to call Format without an argument
 }
