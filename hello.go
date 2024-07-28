@@ -1,35 +1,56 @@
 package main
 
-type Formatter interface {
-	Format() string
+type notification interface {
+	importance() int
 }
 
-type PlainText struct {
-	message string
+type directMessage struct {
+	senderUsername string
+	messageContent string
+	priorityLevel  int
+	isUrgent       bool
 }
 
-func (pt PlainText) Format() string {
-	return pt.message
+type groupMessage struct {
+	groupName      string
+	messageContent string
+	priorityLevel  int
 }
 
-type Bold struct {
-	message string
+type systemAlert struct {
+	alertCode      string
+	messageContent string
 }
 
-func (b Bold) Format() string {
-	return "**" + b.message + "**"
+func (DM directMessage) importance() int {
+	switch {
+	case DM.isUrgent:
+		return 50
+	default:
+		return DM.priorityLevel
+	}
 }
 
-type Code struct {
-	message string
+func (GM groupMessage) importance() int {
+	return GM.priorityLevel
 }
 
-func (c Code) Format() string {
-	return "`" + c.message + "`"
+func (SA systemAlert) importance() int {
+	return 100
 }
 
-// Don't Touch below this line
-
-func SendMessage(formatter Formatter) string {
-	return formatter.Format() // Adjusted to call Format without an argument
+func processNotification(n notification) (string, int) {
+	switch n.(type) {
+	case directMessage:
+		var dm = n.(directMessage)
+		return dm.senderUsername, dm.importance()
+	case groupMessage:
+		var gm = n.(groupMessage)
+		return gm.groupName, gm.importance()
+	case systemAlert:
+		var sa = n.(systemAlert)
+		return sa.alertCode, sa.importance()
+	default:
+		return "", 0
+	}
 }
