@@ -1,56 +1,20 @@
 package main
 
-type notification interface {
-	importance() int
+import (
+	"fmt"
+)
+
+func sendSMSToCouple(msgToCustomer, msgToSpouse string) (int, error) {
+	// ?
 }
 
-type directMessage struct {
-	senderUsername string
-	messageContent string
-	priorityLevel  int
-	isUrgent       bool
-}
+// don't edit below this line
 
-type groupMessage struct {
-	groupName      string
-	messageContent string
-	priorityLevel  int
-}
-
-type systemAlert struct {
-	alertCode      string
-	messageContent string
-}
-
-func (DM directMessage) importance() int {
-	switch {
-	case DM.isUrgent:
-		return 50
-	default:
-		return DM.priorityLevel
+func sendSMS(message string) (int, error) {
+	const maxTextLen = 25
+	const costPerChar = 2
+	if len(message) > maxTextLen {
+		return 0, fmt.Errorf("can't send texts over %v characters", maxTextLen)
 	}
-}
-
-func (GM groupMessage) importance() int {
-	return GM.priorityLevel
-}
-
-func (SA systemAlert) importance() int {
-	return 100
-}
-
-func processNotification(n notification) (string, int) {
-	switch n.(type) {
-	case directMessage:
-		var dm = n.(directMessage)
-		return dm.senderUsername, dm.importance()
-	case groupMessage:
-		var gm = n.(groupMessage)
-		return gm.groupName, gm.importance()
-	case systemAlert:
-		var sa = n.(systemAlert)
-		return sa.alertCode, sa.importance()
-	default:
-		return "", 0
-	}
+	return costPerChar * len(message), nil
 }
