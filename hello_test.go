@@ -5,24 +5,25 @@ import (
 	"testing"
 )
 
-func TestDivide(t *testing.T) {
-	type testCase struct {
-		x, y, expected float64
-		expectedErr    string
-	}
-
-	testCases := []testCase{
-		{10, 0, 0, "no dividing by 0"},
-		{10, 2, 5, ""},
-		{15, 30, 0.5, ""},
-		{6, 3, 2, ""},
+func TestValidateStatus(t *testing.T) {
+	testCases := []struct {
+		status      string
+		expectedErr string
+	}{
+		{"", "status cannot be empty"},
+		{"This is a valid status update that is well within the character limit.", ""},
+		{"This status update is way too long. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.", "status exceeds 140 characters"},
 	}
 	if withSubmit {
 		testCases = append(testCases,
-			testCase{0, 10, 0, ""},
-			testCase{100, 0, 0, "no dividing by 0"},
-			testCase{-10, -2, 5, ""},
-			testCase{-10, 2, -5, ""},
+			struct {
+				status      string
+				expectedErr string
+			}{"Another valid status.", ""},
+			struct {
+				status      string
+				expectedErr string
+			}{"This status update, while derivative, contains exactly one hundred and forty-one characters, which is over the status update character limit.", "status exceeds 140 characters"},
 		)
 	}
 
@@ -30,26 +31,26 @@ func TestDivide(t *testing.T) {
 	failCount := 0
 
 	for _, tc := range testCases {
-		result, err := divide(tc.x, tc.y)
+		err := validateStatus(tc.status)
 		errString := ""
 		if err != nil {
 			errString = err.Error()
 		}
-		if result != tc.expected || errString != tc.expectedErr {
+		if errString != tc.expectedErr {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v, %v)
-Expecting:  (%v, %v)
-Actual:     (%v, %v)
-Fail`, tc.x, tc.y, tc.expected, tc.expectedErr, result, errString)
+Inputs:     "%v"
+Expecting:  "%v"
+Actual:     "%v"
+Fail`, tc.status, tc.expectedErr, errString)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v, %v)
-Expecting:  (%v, %v)
-Actual:     (%v, %v)
+Inputs:     "%v"
+Expecting:  "%v"
+Actual:     "%v"
 Pass
-`, tc.x, tc.y, tc.expected, tc.expectedErr, result, errString)
+`, tc.status, tc.expectedErr, errString)
 		}
 	}
 
