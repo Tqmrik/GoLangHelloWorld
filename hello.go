@@ -1,17 +1,9 @@
 package main
 
-import (
-	"errors"
-)
-
-func validateStatus(status string) error {
-	switch {
-	case status == "":
-		return errors.New("status cannot be empty")
-	case len(status) > 140:
-		return errors.New("status exceeds 140 characters")
-	default:
-		return nil
+func bulkSend(numMessages int) float64 {
+	var b float64 = 0
+	for i := 0; i < numMessages; i++ {
+		b += 1 + 0.01*float64(i)
 	}
-
+	return b
 }

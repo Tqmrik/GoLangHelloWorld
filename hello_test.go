@@ -5,52 +5,44 @@ import (
 	"testing"
 )
 
-func TestValidateStatus(t *testing.T) {
-	testCases := []struct {
-		status      string
-		expectedErr string
-	}{
-		{"", "status cannot be empty"},
-		{"This is a valid status update that is well within the character limit.", ""},
-		{"This status update is way too long. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.", "status exceeds 140 characters"},
+func Test(t *testing.T) {
+	type testCase struct {
+		numMessages int
+		expected    float64
+	}
+	tests := []testCase{
+		{10, 10.45},
+		{20, 21.9},
 	}
 	if withSubmit {
-		testCases = append(testCases,
-			struct {
-				status      string
-				expectedErr string
-			}{"Another valid status.", ""},
-			struct {
-				status      string
-				expectedErr string
-			}{"This status update, while derivative, contains exactly one hundred and forty-one characters, which is over the status update character limit.", "status exceeds 140 characters"},
-		)
+		tests = append(tests, []testCase{
+			{0, 0.0},
+			{1, 1.0},
+			{5, 5.10},
+			{30, 34.35},
+		}...)
 	}
 
 	passCount := 0
 	failCount := 0
 
-	for _, tc := range testCases {
-		err := validateStatus(tc.status)
-		errString := ""
-		if err != nil {
-			errString = err.Error()
-		}
-		if errString != tc.expectedErr {
+	for _, test := range tests {
+		output := bulkSend(test.numMessages)
+		if fmt.Sprintf("%.2f", output) != fmt.Sprintf("%.2f", test.expected) {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     "%v"
-Expecting:  "%v"
-Actual:     "%v"
-Fail`, tc.status, tc.expectedErr, errString)
+Inputs:     (%v)
+Expecting:  %.2f
+Actual:     %.2f
+Fail`, test.numMessages, test.expected, output)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     "%v"
-Expecting:  "%v"
-Actual:     "%v"
+Inputs:     (%v)
+Expecting:  %.2f
+Actual:     %.2f
 Pass
-`, tc.status, tc.expectedErr, errString)
+`, test.numMessages, test.expected, output)
 		}
 	}
 
@@ -58,4 +50,5 @@ Pass
 	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
 }
 
+// withSubmit is set at compile time depending on which button is used to run the tests
 var withSubmit = true
